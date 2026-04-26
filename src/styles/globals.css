@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Lato:wght@300;400;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* Admin palette — minimalista moderno */
+  --color-admin-bg: #ffffff;
+  --color-admin-surface: #f9f9f9;
+  --color-admin-border: #e5e7eb;
+  --color-admin-text: #111827;
+  --color-admin-muted: #6b7280;
+  --color-admin-accent: #C9956C;
+  --color-admin-accent-hover: #b5814f;
+
+  /* Public palette — romântico */
+  --color-pub-bg: #FDF8F0;
+  --color-pub-surface: #FAF3E8;
+  --color-pub-rose: #C9956C;
+  --color-pub-rose-dark: #b5814f;
+  --color-pub-sage: #8A9E7E;
+  --color-pub-text: #3d2c1e;
+  --color-pub-muted: #7a6555;
+
+  /* Typography */
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-lato: 'Lato', system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-inter);
+    color: var(--color-admin-text);
+    background-color: var(--color-admin-bg);
+    -webkit-font-smoothing: antialiased;
+  }
+}
