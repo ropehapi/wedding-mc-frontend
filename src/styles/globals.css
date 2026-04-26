@@ -29,6 +29,15 @@
   --color-pub-text: #3d2c1e;
   --color-pub-muted: #7a6555;
 
+  /* Aliases public-* → pub-* */
+  --color-public-bg: #FDF8F0;
+  --color-public-surface: #FAF3E8;
+  --color-public-gold: #C9956C;
+  --color-public-gold-dark: #b5814f;
+  --color-public-sage: #8A9E7E;
+  --color-public-text: #3d2c1e;
+  --color-public-muted: #7a6555;
+
   /* Typography */
   --font-playfair: 'Playfair Display', Georgia, serif;
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;

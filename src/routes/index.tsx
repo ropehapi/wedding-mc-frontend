@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 import PublicOnlyRoute from './PublicOnlyRoute'
+import AdminLayout from '@/components/layout/AdminLayout'
+import PublicLayout from '@/components/layout/PublicLayout'
 import LoginPage from '@/pages/admin/LoginPage'
 import RegisterPage from '@/pages/admin/RegisterPage'
 import DashboardPage from '@/pages/admin/DashboardPage'
@@ -18,16 +20,20 @@ export default function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
-      {/* Rotas protegidas — requer autenticação */}
+      {/* Rotas protegidas com layout admin */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/wedding" element={<WeddingPage />} />
-        <Route path="/guests" element={<GuestsPage />} />
-        <Route path="/gifts" element={<GiftsPage />} />
+        <Route element={<AdminLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/wedding" element={<WeddingPage />} />
+          <Route path="/guests" element={<GuestsPage />} />
+          <Route path="/gifts" element={<GiftsPage />} />
+        </Route>
       </Route>
 
       {/* Página pública do casamento */}
-      <Route path="/:slug" element={<PublicWeddingPage />} />
+      <Route element={<PublicLayout />}>
+        <Route path="/:slug" element={<PublicWeddingPage />} />
+      </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>404 — Página não encontrada</div>} />
