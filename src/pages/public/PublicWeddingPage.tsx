@@ -14,7 +14,7 @@ import {
   reserveGift,
 } from '@/api/public'
 import { formatDate, formatTime, formatCurrency } from '@/lib/utils'
-import type { Gift } from '@/types/api'
+import type { PublicGift } from '@/types/api'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -48,7 +48,7 @@ export default function PublicWeddingPage() {
     )
   }
 
-  const coverPhoto = wedding.photos?.[0]?.url
+  const coverPhoto = (wedding.photos?.find((p) => p.is_cover) ?? wedding.photos?.[0])?.url
 
   return (
     <div className="min-h-screen bg-public-bg font-lato text-public-text">
@@ -269,7 +269,7 @@ function RsvpSection({ slug }: { slug: string }) {
 
 // ─── Gift Card ───────────────────────────────────────────────────────────────
 
-function GiftCard({ gift, slug }: { gift: Gift; slug: string }) {
+function GiftCard({ gift, slug }: { gift: PublicGift; slug: string }) {
   const [reserveOpen, setReserveOpen] = useState(false)
 
   return (
@@ -290,7 +290,7 @@ function GiftCard({ gift, slug }: { gift: Gift; slug: string }) {
           <p className="mt-2 text-sm font-medium text-public-gold">{formatCurrency(gift.price)}</p>
 
           <div className="mt-auto pt-4 flex items-center justify-between gap-2">
-            {gift.status === 'available' ? (
+            {!gift.reserved ? (
               <>
                 <Button
                   size="sm"

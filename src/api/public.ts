@@ -1,5 +1,5 @@
 import { publicClient } from './client'
-import type { PublicWedding, Gift } from '@/types/api'
+import type { PublicWedding, PublicGift } from '@/types/api'
 
 export function getPublicWedding(slug: string) {
   return publicClient.get<PublicWedding>(`/v1/public/${slug}`)
@@ -16,7 +16,7 @@ export function submitRsvp(slug: string, guestID: string, status: 'confirmed' | 
 }
 
 export function getPublicGifts(slug: string) {
-  return publicClient.get<Gift[]>(`/v1/public/${slug}/gifts`)
+  return publicClient.get<PublicGift[]>(`/v1/public/${slug}/gifts`)
 }
 
 export function reserveGift(slug: string, giftID: string, guestName: string) {

@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { useWedding, useCreateWedding, useUpdateWedding, useUploadPhoto, useDeletePhoto } from '@/hooks/useWedding'
+import { useWedding, useCreateWedding, useUpdateWedding, useUploadPhoto, useDeletePhoto, useSetCoverPhoto } from '@/hooks/useWedding'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -41,6 +41,7 @@ export default function WeddingPage() {
   const updateWedding = useUpdateWedding()
   const uploadPhoto = useUploadPhoto()
   const deletePhoto = useDeletePhoto()
+  const setCoverPhoto = useSetCoverPhoto()
 
   const fileRef = useRef<HTMLInputElement>(null)
   const [deletePhotoId, setDeletePhotoId] = useState<string | null>(null)
@@ -394,14 +395,35 @@ export default function WeddingPage() {
                         alt=""
                         className="h-full w-full object-cover transition-opacity group-hover:opacity-80"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setDeletePhotoId(photo.id)}
-                        className="absolute right-1.5 top-1.5 hidden rounded-full bg-white/90 p-1 text-xs text-destructive shadow group-hover:flex"
-                        aria-label="Remover foto"
-                      >
-                        ✕
-                      </button>
+                      {photo.is_cover && (
+                        <div className="absolute left-1.5 top-1.5 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
+                          Principal
+                        </div>
+                      )}
+                      <div className="absolute right-1.5 top-1.5 hidden flex-col gap-1 group-hover:flex">
+                        {!photo.is_cover && (
+                          <button
+                            type="button"
+                            onClick={() => setCoverPhoto.mutate(photo.id, {
+                              onSuccess: () => toast.success('Foto principal definida!'),
+                              onError: () => toast.error('Erro ao definir foto principal.'),
+                            })}
+                            disabled={setCoverPhoto.isPending}
+                            className="rounded-full bg-white/90 p-1 text-xs text-amber-500 shadow"
+                            aria-label="Definir como foto principal"
+                          >
+                            ★
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setDeletePhotoId(photo.id)}
+                          className="rounded-full bg-white/90 p-1 text-xs text-destructive shadow"
+                          aria-label="Remover foto"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>

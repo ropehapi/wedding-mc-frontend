@@ -38,3 +38,7 @@ export function uploadPhoto(file: File) {
 export function deletePhoto(photoID: string) {
   return client.delete(`/v1/wedding/photos/${photoID}`)
 }
+
+export function setCoverPhoto(photoID: string) {
+  return client.patch(`/v1/wedding/photos/${photoID}/cover`)
+}

@@ -48,6 +48,16 @@ export interface Gift {
   reserved_by: string | null
 }
 
+export interface PublicGift {
+  id: string
+  name: string
+  description: string | null
+  price: number | null
+  image_url: string | null
+  store_url: string | null
+  reserved: boolean
+}
+
 export interface GiftsSummary {
   total: number
   available: number
@@ -64,6 +74,7 @@ export interface WeddingPhoto {
   id: string
   url: string
   order: number
+  is_cover: boolean
 }
 
 export interface Wedding {

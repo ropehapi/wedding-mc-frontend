@@ -5,6 +5,7 @@ import {
   updateWedding,
   uploadPhoto,
   deletePhoto,
+  setCoverPhoto,
   type CreateWeddingData,
   type UpdateWeddingData,
 } from '@/api/wedding'
@@ -48,6 +49,14 @@ export function useDeletePhoto() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (photoID: string) => deletePhoto(photoID),
+    onSuccess: () => qc.invalidateQueries({ queryKey: WEDDING_KEY }),
+  })
+}
+
+export function useSetCoverPhoto() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (photoID: string) => setCoverPhoto(photoID),
     onSuccess: () => qc.invalidateQueries({ queryKey: WEDDING_KEY }),
   })
 }
