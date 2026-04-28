@@ -5,6 +5,57 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
+interface PieSlice {
+  label: string
+  value: number
+  color: string
+}
+
+function PieChart({ slices }: { slices: PieSlice[] }) {
+  const total = slices.reduce((s, p) => s + p.value, 0)
+  if (total === 0) return null
+
+  const cx = 50
+  const cy = 50
+  const r = 40
+
+  let startAngle = -Math.PI / 2
+  const paths = slices
+    .filter((s) => s.value > 0)
+    .map((slice) => {
+      const angle = (slice.value / total) * 2 * Math.PI
+      const endAngle = startAngle + angle
+      const x1 = cx + r * Math.cos(startAngle)
+      const y1 = cy + r * Math.sin(startAngle)
+      const x2 = cx + r * Math.cos(endAngle)
+      const y2 = cy + r * Math.sin(endAngle)
+      const largeArc = angle > Math.PI ? 1 : 0
+      const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`
+      startAngle = endAngle
+      return { d, color: slice.color, label: slice.label, value: slice.value }
+    })
+
+  return (
+    <div className="flex items-center gap-4 mt-4">
+      <svg viewBox="0 0 100 100" className="w-24 h-24 shrink-0">
+        {paths.map((p) => (
+          <path key={p.label} d={p.d} fill={p.color} />
+        ))}
+        <circle cx={cx} cy={cy} r={18} fill="white" />
+      </svg>
+      <ul className="space-y-1.5 text-sm">
+        {slices.map((s) => (
+          <li key={s.label} className="flex items-center gap-2">
+            <span className="inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
+            <span className="text-admin-muted">{s.label}</span>
+            <span className="font-medium text-admin-text ml-auto pl-2">{s.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { wedding, guestsSummary, giftsSummary, isLoading } = useDashboard()
 
@@ -86,15 +137,17 @@ export default function DashboardPage() {
           </div>
 
           {guestsSummary ? (
-            <div className="mt-4 space-y-3">
+            <div className="mt-2">
               <p className="font-playfair text-3xl font-semibold text-admin-text">
                 {guestsSummary.total}
               </p>
-              <div className="space-y-1.5">
-                <StatRow label="Confirmados" value={guestsSummary.confirmed} color="text-green-600" total={guestsSummary.total} />
-                <StatRow label="Pendentes" value={guestsSummary.pending} color="text-yellow-600" total={guestsSummary.total} />
-                <StatRow label="Recusaram" value={guestsSummary.declined} color="text-red-600" total={guestsSummary.total} />
-              </div>
+              <PieChart
+                slices={[
+                  { label: 'Confirmados', value: guestsSummary.confirmed, color: '#16a34a' },
+                  { label: 'Pendentes', value: guestsSummary.pending, color: '#ca8a04' },
+                  { label: 'Recusaram', value: guestsSummary.declined, color: '#dc2626' },
+                ]}
+              />
             </div>
           ) : (
             <p className="mt-4 text-sm text-admin-muted">Nenhum convidado ainda.</p>
@@ -125,14 +178,16 @@ export default function DashboardPage() {
           </div>
 
           {giftsSummary ? (
-            <div className="mt-4 space-y-3">
+            <div className="mt-2">
               <p className="font-playfair text-3xl font-semibold text-admin-text">
                 {giftsSummary.total}
               </p>
-              <div className="space-y-1.5">
-                <StatRow label="Disponíveis" value={giftsSummary.available} color="text-green-600" total={giftsSummary.total} />
-                <StatRow label="Reservados" value={giftsSummary.reserved} color="text-blue-600" total={giftsSummary.total} />
-              </div>
+              <PieChart
+                slices={[
+                  { label: 'Disponíveis', value: giftsSummary.available, color: '#16a34a' },
+                  { label: 'Reservados', value: giftsSummary.reserved, color: '#2563eb' },
+                ]}
+              />
             </div>
           ) : (
             <p className="mt-4 text-sm text-admin-muted">Nenhum presente ainda.</p>
@@ -152,28 +207,3 @@ export default function DashboardPage() {
   )
 }
 
-function StatRow({
-  label,
-  value,
-  color,
-  total,
-}: {
-  label: string
-  value: number
-  color: string
-  total: number
-}) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="w-24 text-admin-muted">{label}</span>
-      <div className="flex-1 overflow-hidden rounded-full bg-admin-surface h-1.5">
-        <div
-          className={`h-full rounded-full ${color.replace('text-', 'bg-')}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className={`w-6 text-right font-medium ${color}`}>{value}</span>
-    </div>
-  )
-}

@@ -1,15 +1,30 @@
 import { useState } from 'react'
+import type React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { Gift, User } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const navItems = [
+function RingIcon({ size = 17 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="14" r="7" />
+      <circle cx="12" cy="14" r="3.5" />
+      <path d="M9 7.5 L7.5 3 L12 5 L16.5 3 L15 7.5" />
+    </svg>
+  )
+}
+
+type NavIcon = string | LucideIcon | React.FC<{ size?: number }>
+
+const navItems: { to: string; label: string; icon: NavIcon }[] = [
   { to: '/dashboard', label: 'Dashboard', icon: '◈' },
-  { to: '/wedding', label: 'Casamento', icon: '♡' },
-  { to: '/guests', label: 'Convidados', icon: '◉' },
-  { to: '/gifts', label: 'Presentes', icon: '◇' },
+  { to: '/wedding', label: 'Casamento', icon: RingIcon },
+  { to: '/guests', label: 'Convidados', icon: User },
+  { to: '/gifts', label: 'Presentes', icon: Gift },
 ]
 
 export default function AdminLayout() {
@@ -63,7 +78,10 @@ export default function AdminLayout() {
                 }`
               }
             >
-              <span className="text-base">{item.icon}</span>
+              {typeof item.icon === 'string'
+                ? <span className="text-base">{item.icon}</span>
+                : <item.icon size={17} strokeWidth={1.5} />
+              }
               {item.label}
             </NavLink>
           ))}
