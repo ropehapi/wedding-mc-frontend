@@ -24,6 +24,7 @@ export interface Guest {
   id: string
   name: string
   status: GuestStatus
+  access_code: string
   rsvp_at: string | null
 }
 

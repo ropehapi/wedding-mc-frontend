@@ -11,16 +11,32 @@ export function getPublicGuests(slug: string) {
   )
 }
 
-export function submitRsvp(slug: string, guestID: string, status: 'confirmed' | 'declined') {
-  return publicClient.post(`/v1/public/${slug}/guests/${guestID}/rsvp`, { status })
+export function validateGuestCode(slug: string, accessCode: string) {
+  return publicClient.post<{ id: string; name: string; status: string }>(
+    `/v1/public/${slug}/guests/validate-code`,
+    { access_code: accessCode },
+  )
+}
+
+export function submitRsvp(
+  slug: string,
+  guestID: string,
+  accessCode: string,
+  status: 'confirmed' | 'declined',
+) {
+  return publicClient.post(`/v1/public/${slug}/guests/${guestID}/rsvp`, {
+    status,
+    access_code: accessCode,
+  })
 }
 
 export function getPublicGifts(slug: string) {
   return publicClient.get<PublicGift[]>(`/v1/public/${slug}/gifts`)
 }
 
-export function reserveGift(slug: string, giftID: string, guestName: string) {
+export function reserveGift(slug: string, giftID: string, guestId: string, accessCode: string) {
   return publicClient.post(`/v1/public/${slug}/gifts/${giftID}/reserve`, {
-    guest_name: guestName,
+    guest_id: guestId,
+    access_code: accessCode,
   })
 }

@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import axios from 'axios'
 import {
   getPublicWedding,
-  getPublicGuests,
+  validateGuestCode,
   submitRsvp,
   getPublicGifts,
   reserveGift,
@@ -18,7 +15,6 @@ import type { PublicGift } from '@/types/api'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 
 export default function PublicWeddingPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -143,11 +139,13 @@ export default function PublicWeddingPage() {
       )}
 
       {/* RSVP */}
-      <section className="bg-public-gold/5 py-16">
+      <section className="bg-public-gold/5 py-20">
         <div className="mx-auto max-w-xl px-4 text-center">
           <SectionTitle>Confirmação de Presença</SectionTitle>
-          <p className="mt-3 text-public-muted">Confirme sua presença até a data do evento.</p>
-          <div className="mt-8">
+          <p className="mt-4 font-cormorant text-xl text-public-text/70">
+            Confirme sua presença no casamento através do botão abaixo usando o código de confirmação do convite
+          </p>
+          <div className="mt-10">
             <RsvpSection slug={slug!} />
           </div>
         </div>
@@ -171,99 +169,147 @@ export default function PublicWeddingPage() {
 // ─── RSVP ───────────────────────────────────────────────────────────────────
 
 function RsvpSection({ slug }: { slug: string }) {
-  const [selectedId, setSelectedId] = useState('')
+  const [codeModalOpen, setCodeModalOpen] = useState(false)
+  const [code, setCode] = useState('')
+  const [guest, setGuest] = useState<{ id: string; name: string; status: string } | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const [submitted, setSubmitted] = useState<'confirmed' | 'declined' | null>(null)
-  const [open, setOpen] = useState(false)
 
-  const { data: guests, isLoading } = useQuery({
-    queryKey: ['public-guests', slug],
-    queryFn: () => getPublicGuests(slug).then((r) => r.data),
-    enabled: open,
+  const validateMutation = useMutation({
+    mutationFn: () => validateGuestCode(slug, code).then((r) => r.data),
+    onSuccess: (data) => {
+      setGuest(data)
+      setCodeModalOpen(false)
+      setConfirmOpen(true)
+    },
+    onError: (error: { response?: { status?: number } }) => {
+      if (error?.response?.status === 403 || error?.response?.status === 404) {
+        toast.error('Código inválido. Verifique e tente novamente.')
+      } else {
+        toast.error('Erro ao validar código. Tente novamente.')
+      }
+    },
   })
 
   const rsvpMutation = useMutation({
     mutationFn: (status: 'confirmed' | 'declined') =>
-      submitRsvp(slug, selectedId, status).then(() => status),
+      submitRsvp(slug, guest!.id, code, status).then(() => status),
     onSuccess: (status) => {
+      setConfirmOpen(false)
       setSubmitted(status)
-      toast.success(status === 'confirmed' ? 'Presença confirmada! 🎉' : 'Resposta registrada.')
     },
-    onError: () => toast.error('Erro ao confirmar. Tente novamente.'),
+    onError: () => toast.error('Erro ao registrar resposta. Tente novamente.'),
   })
 
-  if (submitted === 'confirmed') {
-    return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-        <p className="font-cormorant text-3xl text-public-gold">Até lá! 🥂</p>
-        <p className="mt-2 text-public-muted">Sua presença foi confirmada. Mal podemos esperar!</p>
-      </div>
-    )
-  }
-
-  if (submitted === 'declined') {
-    return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-        <p className="font-cormorant text-2xl text-public-text">Obrigado pela resposta</p>
-        <p className="mt-2 text-public-muted">Sentiremos sua falta.</p>
-      </div>
-    )
-  }
-
-  if (!open) {
-    return (
-      <Button
-        className="rounded-full border border-public-gold bg-transparent px-8 py-2 text-public-gold hover:bg-public-gold hover:text-white"
-        onClick={() => setOpen(true)}
-      >
-        Confirmar Presença
-      </Button>
-    )
+  function handleCloseCodeModal() {
+    setCodeModalOpen(false)
+    setCode('')
   }
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-sm text-left">
-      <div className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="rsvp-guest">Selecione seu nome</Label>
-          {isLoading ? (
-            <div className="h-9 w-full animate-pulse rounded-md bg-gray-100" />
-          ) : (
-            <select
-              id="rsvp-guest"
-              value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Selecione…</option>
-              {guests?.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                  {g.status !== 'pending' ? ` (${g.status === 'confirmed' ? 'Confirmado' : 'Recusou'})` : ''}
-                </option>
-              ))}
-            </select>
-          )}
+    <>
+      {/* Feedback pós-confirmação */}
+      {submitted === 'confirmed' && (
+        <div className="mb-8 rounded-2xl bg-white p-10 text-center shadow-sm">
+          <p className="font-cormorant text-4xl text-public-gold">Até lá! 🥂</p>
+          <p className="mt-3 text-public-muted">Sua presença foi confirmada. Mal podemos esperar!</p>
         </div>
+      )}
+      {submitted === 'declined' && (
+        <div className="mb-8 rounded-2xl bg-white p-10 text-center shadow-sm">
+          <p className="font-cormorant text-3xl text-public-text">Obrigado pela resposta</p>
+          <p className="mt-3 text-public-muted">Sentiremos sua falta.</p>
+        </div>
+      )}
 
-        <div className="flex gap-3">
-          <Button
-            className="flex-1 rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
-            disabled={!selectedId || rsvpMutation.isPending}
-            onClick={() => rsvpMutation.mutate('confirmed')}
-          >
-            Vou comparecer 🎉
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 rounded-full border-gray-300"
-            disabled={!selectedId || rsvpMutation.isPending}
-            onClick={() => rsvpMutation.mutate('declined')}
-          >
-            Não poderei ir
-          </Button>
-        </div>
-      </div>
-    </div>
+      {/* Botão principal */}
+      {submitted && (
+        <p className="mb-4 font-cormorant text-xl text-public-text/70">Falta confirmar mais alguém?</p>
+      )}
+      <button
+        onClick={() => setCodeModalOpen(true)}
+        className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-public-gold px-10 py-4 text-white shadow-lg shadow-public-gold/30 transition-all duration-300 hover:bg-public-gold/90 hover:shadow-xl hover:shadow-public-gold/40 hover:-translate-y-0.5 active:translate-y-0"
+      >
+        <span className="font-cormorant text-xl font-light tracking-wide">Confirmar Presença</span>
+        <span className="text-white/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
+      </button>
+
+      {/* Modal — Inserir código */}
+      <Dialog open={codeModalOpen} onOpenChange={(v) => !v && handleCloseCodeModal()}>
+        <DialogContent className="max-w-sm border-public-gold/20">
+          <DialogHeader>
+            <DialogTitle className="font-cormorant text-2xl font-light text-public-text text-center">
+              Código do Convite
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5 py-2">
+            <p className="text-center text-sm text-public-muted">
+              Digite o código de 6 dígitos que acompanha o seu convite.
+            </p>
+            <Input
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              maxLength={6}
+              className="text-center text-2xl tracking-[0.6em] font-mono h-14 border-public-gold/30 focus-visible:ring-public-gold/40"
+              onKeyDown={(e) => e.key === 'Enter' && code.length === 6 && validateMutation.mutate()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
+              disabled={code.length !== 6 || validateMutation.isPending}
+              onClick={() => validateMutation.mutate()}
+            >
+              {validateMutation.isPending ? 'Verificando…' : 'Continuar'}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full rounded-full text-public-muted"
+              onClick={handleCloseCodeModal}
+              disabled={validateMutation.isPending}
+            >
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal — Confirmação */}
+      <Dialog open={confirmOpen} onOpenChange={(v) => !v && setConfirmOpen(false)}>
+        <DialogContent className="max-w-sm border-public-gold/20">
+          <DialogHeader>
+            <DialogTitle className="font-cormorant text-2xl font-light text-public-text text-center">
+              Confirmação de Presença
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-5 text-center space-y-2">
+            <p className="text-public-muted text-sm">Olá,</p>
+            <p className="font-cormorant text-4xl text-public-text leading-tight">{guest?.name}</p>
+            <div className="mx-auto mt-2 h-px w-12 bg-public-gold/30" />
+            <p className="text-public-muted text-sm pt-2">Você irá comparecer ao evento?</p>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
+              disabled={rsvpMutation.isPending}
+              onClick={() => rsvpMutation.mutate('confirmed')}
+            >
+              {rsvpMutation.isPending ? 'Confirmando…' : 'Sim, vou comparecer 🎉'}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full rounded-full border-public-gold/30 text-public-muted hover:text-public-text"
+              disabled={rsvpMutation.isPending}
+              onClick={() => rsvpMutation.mutate('declined')}
+            >
+              Não poderei ir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
@@ -332,10 +378,6 @@ function GiftCard({ gift, slug }: { gift: PublicGift; slug: string }) {
 
 // ─── Reserve Modal ───────────────────────────────────────────────────────────
 
-const reserveSchema = z.object({
-  guestName: z.string().min(1, 'Informe seu nome'),
-})
-
 function ReserveModal({
   open,
   giftName,
@@ -350,17 +392,30 @@ function ReserveModal({
   onClose: () => void
 }) {
   const qc = useQueryClient()
-  const [done, setDone] = useState(false)
+  const [step, setStep] = useState<'code' | 'confirm' | 'done'>('code')
+  const [code, setCode] = useState('')
+  const [guest, setGuest] = useState<{ id: string; name: string } | null>(null)
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<{ guestName: string }>({
-    resolver: zodResolver(reserveSchema),
+  const validateMutation = useMutation({
+    mutationFn: () => validateGuestCode(slug, code).then((r) => r.data),
+    onSuccess: (data) => {
+      setGuest(data)
+      setStep('confirm')
+    },
+    onError: (error: { response?: { status?: number } }) => {
+      if (error?.response?.status === 403 || error?.response?.status === 404) {
+        toast.error('Código inválido. Verifique e tente novamente.')
+      } else {
+        toast.error('Erro ao validar código. Tente novamente.')
+      }
+    },
   })
 
-  const mutation = useMutation({
-    mutationFn: (guestName: string) => reserveGift(slug, giftId, guestName),
+  const reserveMutation = useMutation({
+    mutationFn: () => reserveGift(slug, giftId, guest!.id, code),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['public-gifts', slug] })
-      setDone(true)
+      setStep('done')
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -372,8 +427,9 @@ function ReserveModal({
   })
 
   function handleClose() {
-    reset()
-    setDone(false)
+    setStep('code')
+    setCode('')
+    setGuest(null)
     onClose()
   }
 
@@ -381,17 +437,82 @@ function ReserveModal({
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="max-w-sm border-public-gold/20">
         <DialogHeader>
-          <DialogTitle className="font-cormorant text-xl text-public-text">
-            {done ? 'Reservado!' : 'Dar este presente'}
+          <DialogTitle className="font-cormorant text-2xl font-light text-public-text text-center">
+            {step === 'done' ? 'Reservado!' : 'Dar este presente'}
           </DialogTitle>
         </DialogHeader>
 
-        {done ? (
+        {step === 'code' && (
+          <>
+            <div className="space-y-5 py-2">
+              <p className="text-center text-sm text-public-muted">
+                Digite o código de 6 dígitos que acompanha o seu convite.
+              </p>
+              <Input
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="text-center text-2xl tracking-[0.6em] font-mono h-14 border-public-gold/30 focus-visible:ring-public-gold/40"
+                onKeyDown={(e) => e.key === 'Enter' && code.length === 6 && validateMutation.mutate()}
+                autoFocus
+              />
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button
+                className="w-full rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
+                disabled={code.length !== 6 || validateMutation.isPending}
+                onClick={() => validateMutation.mutate()}
+              >
+                {validateMutation.isPending ? 'Verificando…' : 'Continuar'}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full rounded-full text-public-muted"
+                onClick={handleClose}
+                disabled={validateMutation.isPending}
+              >
+                Cancelar
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+
+        {step === 'confirm' && (
+          <>
+            <div className="py-5 text-center space-y-2">
+              <p className="text-public-muted text-sm">Olá,</p>
+              <p className="font-cormorant text-4xl text-public-text leading-tight">{guest?.name}</p>
+              <div className="mx-auto mt-2 h-px w-12 bg-public-gold/30" />
+              <p className="text-public-muted text-sm pt-2">
+                Você deseja reservar{' '}
+                <span className="font-medium text-public-text">{giftName}</span>?
+              </p>
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button
+                className="w-full rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
+                disabled={reserveMutation.isPending}
+                onClick={() => reserveMutation.mutate()}
+              >
+                {reserveMutation.isPending ? 'Reservando…' : 'Sim, quero dar este presente 🎁'}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full rounded-full text-public-muted"
+                onClick={handleClose}
+                disabled={reserveMutation.isPending}
+              >
+                Cancelar
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+
+        {step === 'done' && (
           <div className="py-4 text-center">
             <p className="text-4xl">🎁</p>
-            <p className="mt-3 font-cormorant text-lg text-public-text">
-              Obrigado pelo presente!
-            </p>
+            <p className="mt-3 font-cormorant text-lg text-public-text">Obrigado pelo presente!</p>
             <p className="mt-1 text-sm text-public-muted">{giftName} foi reservado.</p>
             <Button
               className="mt-6 w-full rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
@@ -400,41 +521,6 @@ function ReserveModal({
               Fechar
             </Button>
           </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit((d) => mutation.mutate(d.guestName))}
-            className="space-y-4 py-2"
-          >
-            <p className="text-sm text-public-muted">
-              Você está reservando: <span className="font-medium text-public-text">{giftName}</span>
-            </p>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="r-name">Seu nome</Label>
-              <Input
-                id="r-name"
-                {...register('guestName')}
-                placeholder="Como você se chama?"
-                autoFocus
-              />
-              {errors.guestName && (
-                <p className="text-xs text-destructive">{errors.guestName.message}</p>
-              )}
-            </div>
-
-            <DialogFooter className="gap-2 pt-2">
-              <Button type="button" variant="outline" className="rounded-full" onClick={handleClose} disabled={mutation.isPending}>
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="rounded-full bg-public-gold hover:bg-public-gold/90 text-white"
-                disabled={mutation.isPending}
-              >
-                {mutation.isPending ? 'Reservando…' : 'Confirmar'}
-              </Button>
-            </DialogFooter>
-          </form>
         )}
       </DialogContent>
     </Dialog>

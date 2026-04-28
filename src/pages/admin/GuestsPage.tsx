@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import { useGuests, useGuestsSummary, useCreateGuest, useUpdateGuest, useDeleteGuest } from '@/hooks/useGuests'
 import type { Guest, GuestStatus } from '@/types/api'
@@ -147,6 +148,7 @@ export default function GuestsPage() {
               <tr className="border-b border-admin-border bg-admin-surface text-left">
                 <th className="px-4 py-3 font-medium text-admin-muted">Nome</th>
                 <th className="px-4 py-3 font-medium text-admin-muted">Status</th>
+                <th className="hidden px-4 py-3 font-medium text-admin-muted sm:table-cell">Código</th>
                 <th className="hidden px-4 py-3 font-medium text-admin-muted sm:table-cell">RSVP em</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -161,6 +163,25 @@ export default function GuestsPage() {
                       <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
                         {badge.label}
                       </span>
+                    </td>
+                    <td className="hidden px-4 py-3 sm:table-cell">
+                      {guest.access_code ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <code className="rounded bg-admin-surface px-1.5 py-0.5 text-xs font-mono text-admin-text">
+                            {guest.access_code}
+                          </code>
+                          <button
+                            className="text-admin-muted hover:text-admin-text transition-colors"
+                            onClick={() => {
+                              navigator.clipboard.writeText(guest.access_code)
+                              toast.success('Código copiado!')
+                            }}
+                            title="Copiar código"
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </button>
+                        </span>
+                      ) : '—'}
                     </td>
                     <td className="hidden px-4 py-3 text-admin-muted sm:table-cell">
                       {guest.rsvp_at ? formatDate(guest.rsvp_at.slice(0, 10)) : '—'}
