@@ -11,20 +11,27 @@ interface AuthContextValue {
   logout: () => Promise<void>
 }
 
+function hasValidToken() {
+  return !!localStorage.getItem('access_token')
+}
+
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    const stored = localStorage.getItem('user')
-    if (token && stored) {
-      try {
-        setUser(JSON.parse(stored) as User)
-      } catch {
-        localStorage.removeItem('user')
+    if (hasValidToken()) {
+      setIsAuthenticated(true)
+      const stored = localStorage.getItem('user')
+      if (stored) {
+        try {
+          setUser(JSON.parse(stored) as User)
+        } catch {
+          localStorage.removeItem('user')
+        }
       }
     }
     setIsLoading(false)
@@ -34,8 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await publicClient.post<LoginResponse>('/v1/auth/login', { email, password })
     localStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
-    localStorage.setItem('user', JSON.stringify(data.user))
-    setUser(data.user)
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user))
+      setUser(data.user)
+    }
+    setIsAuthenticated(true)
   }, [])
 
   const logout = useCallback(async () => {
@@ -53,12 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
       setUser(null)
+      setIsAuthenticated(false)
     }
   }, [])
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: user !== null, isLoading, login, logout }}
+      value={{ user, isAuthenticated, isLoading, login, logout }}
     >
       {children}
     </AuthContext.Provider>

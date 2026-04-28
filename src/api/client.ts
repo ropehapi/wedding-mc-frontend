@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL as string
 
@@ -31,6 +31,17 @@ function processQueue(error: unknown, token: string | null) {
   })
   failedQueue = []
 }
+
+// Response interceptor — desembrulha envelope { data: { ... } } do backend
+function unwrapEnvelope(response: AxiosResponse): AxiosResponse {
+  if (response.data !== null && typeof response.data === 'object' && 'data' in response.data) {
+    response.data = response.data.data
+  }
+  return response
+}
+
+client.interceptors.response.use(unwrapEnvelope)
+publicClient.interceptors.response.use(unwrapEnvelope)
 
 // Request interceptor — injeta token quando disponível
 client.interceptors.request.use((config) => {

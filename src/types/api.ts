@@ -10,7 +10,7 @@ export interface AuthTokens {
 }
 
 export interface LoginResponse extends AuthTokens {
-  user: User
+  user?: User
 }
 
 export interface RegisterResponse {
