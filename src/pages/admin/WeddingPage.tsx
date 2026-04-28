@@ -19,7 +19,7 @@ const BR_STATES = [
 const schema = z.object({
   bride_name: z.string().min(1, 'Nome da noiva obrigatório'),
   groom_name: z.string().min(1, 'Nome do noivo obrigatório'),
-  date: z.string().min(1, 'Data obrigatória'),
+  date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, 'Data no formato dd/mm/aaaa'),
   time: z.string().optional(),
   location: z.string().min(1, 'Local obrigatório'),
   city: z.string().optional(),
@@ -67,7 +67,7 @@ export default function WeddingPage() {
       reset({
         bride_name: wedding.bride_name,
         groom_name: wedding.groom_name,
-        date: wedding.date,
+        date: wedding.date ? wedding.date.split('-').reverse().join('/') : '',
         time: wedding.time ?? '',
         location: wedding.location,
         city: wedding.city ?? '',
@@ -80,8 +80,10 @@ export default function WeddingPage() {
 
   async function onSubmit(data: FormData) {
     try {
+      const [dd, mm, yyyy] = data.date.split('/')
       const payload = {
         ...data,
+        date: `${yyyy}-${mm}-${dd}`,
         time: data.time || undefined,
         city: data.city || undefined,
         state: data.state || undefined,
@@ -214,7 +216,7 @@ export default function WeddingPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="date">Data</Label>
-                <Input id="date" type="date" {...register('date')} />
+                <Input id="date" type="text" placeholder="dd/mm/aaaa" {...register('date')} />
                 {errors.date && (
                   <p className="text-xs text-destructive">{errors.date.message}</p>
                 )}

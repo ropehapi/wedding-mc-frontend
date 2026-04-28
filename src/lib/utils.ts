@@ -19,6 +19,7 @@ export function formatDate(dateStr: string): string {
 }
 
 export function formatTime(timeStr: string): string {
-  const [hours, minutes] = timeStr.split(':')
+  const timePart = timeStr.includes('T') ? timeStr.split('T')[1] : timeStr
+  const [hours, minutes] = timePart.split(':')
   return `${hours}h${minutes}`
 }
