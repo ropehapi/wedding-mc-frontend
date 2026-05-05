@@ -301,20 +301,23 @@ function Hero() {
 function WeddingPageMockup() {
   return (
     <div
-      className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl shadow-public-text/10"
-      style={{ background: 'linear-gradient(160deg, #FAF3E8 0%, #FDF8F0 60%, #f5ede0 100%)' }}
+      className="relative w-full max-w-sm overflow-hidden rounded-3xl ring-1 ring-white/10"
+      style={{
+        background: 'linear-gradient(160deg, #FAF3E8 0%, #FDF8F0 60%, #f5ede0 100%)',
+        boxShadow: '0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,149,108,0.15), 0 8px 32px rgba(201,149,108,0.15)',
+      }}
     >
       {/* Top gradient bar */}
       <div
-        className="h-40 w-full"
+        className="h-44 w-full"
         style={{
-          background: 'linear-gradient(135deg, #C9956C 0%, #d4a882 40%, #8A9E7E 100%)',
+          background: 'linear-gradient(150deg, #7a4f2e 0%, #C9956C 45%, #8A9E7E 100%)',
         }}
       />
 
       {/* Couple names */}
       <div className="-mt-8 px-8 pb-8 text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full border-2 border-white bg-white shadow-md">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full border-2 border-white bg-white shadow-lg shadow-black/20">
           <span className="font-cormorant text-2xl text-public-gold">♡</span>
         </div>
         <p className="mt-4 font-lato text-[10px] uppercase tracking-[0.3em] text-public-muted">
@@ -329,26 +332,24 @@ function WeddingPageMockup() {
           Igreja São Francisco · São Paulo, SP
         </p>
 
-        <div className="my-5 h-px w-full bg-public-gold/20" />
+        <div className="my-5 h-px w-full bg-public-gold/25" />
 
         {/* Info pills */}
         <div className="flex justify-center gap-3">
-          <div className="flex flex-col items-center rounded-xl bg-white/70 px-4 py-2.5 shadow-sm">
-            <span className="font-lato text-[9px] uppercase tracking-widest text-public-muted">Data</span>
-            <span className="mt-0.5 font-cormorant text-sm text-public-text">15 Nov</span>
-          </div>
-          <div className="flex flex-col items-center rounded-xl bg-white/70 px-4 py-2.5 shadow-sm">
-            <span className="font-lato text-[9px] uppercase tracking-widest text-public-muted">Horário</span>
-            <span className="mt-0.5 font-cormorant text-sm text-public-text">18h00</span>
-          </div>
-          <div className="flex flex-col items-center rounded-xl bg-white/70 px-4 py-2.5 shadow-sm">
-            <span className="font-lato text-[9px] uppercase tracking-widest text-public-muted">Local</span>
-            <span className="mt-0.5 font-cormorant text-sm text-public-text">SP</span>
-          </div>
+          {[
+            { label: 'Data', value: '15 Nov' },
+            { label: 'Horário', value: '18h00' },
+            { label: 'Local', value: 'SP' },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex flex-col items-center rounded-xl bg-white px-4 py-2.5 shadow-sm shadow-black/8">
+              <span className="font-lato text-[9px] uppercase tracking-widest text-public-muted">{label}</span>
+              <span className="mt-0.5 font-cormorant text-sm text-public-text">{value}</span>
+            </div>
+          ))}
         </div>
 
         {/* RSVP button */}
-        <button className="mt-5 w-full rounded-full bg-public-gold py-2.5 font-lato text-xs font-medium text-white shadow-md shadow-public-gold/30">
+        <button className="mt-5 w-full rounded-full bg-public-gold py-2.5 font-lato text-xs font-medium text-white shadow-md shadow-public-gold/40">
           Confirmar Presença
         </button>
 
@@ -357,7 +358,7 @@ function WeddingPageMockup() {
           {['🍽️', '✈️', '🥂'].map((emoji, i) => (
             <div
               key={i}
-              className="flex aspect-square items-center justify-center rounded-xl bg-white/60 text-xl shadow-sm"
+              className="flex aspect-square items-center justify-center rounded-xl bg-white text-xl shadow-sm shadow-black/8"
             >
               {emoji}
             </div>
@@ -367,7 +368,7 @@ function WeddingPageMockup() {
       </div>
 
       {/* Floating badge */}
-      <div className="absolute right-4 top-4 rounded-full border border-white/30 bg-white/20 px-3 py-1 backdrop-blur-sm">
+      <div className="absolute right-4 top-4 rounded-full border border-white/40 bg-black/25 px-3 py-1 backdrop-blur-sm">
         <p className="font-lato text-[9px] font-medium text-white">felizesprasempre.com/ana-e-joao</p>
       </div>
     </div>
