@@ -333,7 +333,9 @@ function GiftCard({ gift, slug }: { gift: PublicGift; slug: string }) {
           {gift.description && (
             <p className="mt-1 text-xs text-public-muted line-clamp-2">{gift.description}</p>
           )}
-          <p className="mt-2 text-sm font-medium text-public-gold">{formatCurrency(gift.price)}</p>
+          {gift.price != null && (
+            <p className="mt-2 text-sm font-medium text-public-gold">{formatCurrency(gift.price)}</p>
+          )}
 
           <div className="mt-auto pt-4 flex items-center justify-between gap-2">
             {!gift.reserved ? (

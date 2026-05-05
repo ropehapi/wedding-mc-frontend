@@ -93,6 +93,28 @@ export interface Wedding {
   photos: WeddingPhoto[]
 }
 
+// Tables
+export interface TableGuest {
+  id: string
+  name: string
+  status: GuestStatus
+}
+
+export interface Table {
+  id: string
+  name: string
+  capacity: number
+  occupied: number
+  guests: TableGuest[]
+  created_at: string
+  updated_at: string
+}
+
+export interface TablesResponse {
+  tables: Table[]
+  unassigned: TableGuest[]
+}
+
 // Public
 export interface PublicWedding extends Wedding {
   guests: Pick<Guest, 'id' | 'name' | 'status'>[]

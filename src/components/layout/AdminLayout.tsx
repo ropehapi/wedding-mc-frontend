@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import { Gift, User } from 'lucide-react'
+import { Gift, User, LayoutGrid } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 function RingIcon({ size = 17 }: { size?: number }) {
@@ -25,6 +25,7 @@ const navItems: { to: string; label: string; icon: NavIcon }[] = [
   { to: '/wedding', label: 'Casamento', icon: RingIcon },
   { to: '/guests', label: 'Convidados', icon: User },
   { to: '/gifts', label: 'Presentes', icon: Gift },
+  { to: '/tables', label: 'Mesas', icon: LayoutGrid },
 ]
 
 export default function AdminLayout() {

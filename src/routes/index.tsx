@@ -9,6 +9,7 @@ import DashboardPage from '@/pages/admin/DashboardPage'
 import WeddingPage from '@/pages/admin/WeddingPage'
 import GuestsPage from '@/pages/admin/GuestsPage'
 import GiftsPage from '@/pages/admin/GiftsPage'
+import TablesPage from '@/pages/admin/TablesPage'
 import PublicWeddingPage from '@/pages/public/PublicWeddingPage'
 import LandingPage from '@/pages/landing/LandingPage'
 
@@ -31,6 +32,7 @@ export default function AppRoutes() {
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/guests" element={<GuestsPage />} />
           <Route path="/gifts" element={<GiftsPage />} />
+          <Route path="/tables" element={<TablesPage />} />
         </Route>
       </Route>
 
