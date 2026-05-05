@@ -10,10 +10,14 @@ import WeddingPage from '@/pages/admin/WeddingPage'
 import GuestsPage from '@/pages/admin/GuestsPage'
 import GiftsPage from '@/pages/admin/GiftsPage'
 import PublicWeddingPage from '@/pages/public/PublicWeddingPage'
+import LandingPage from '@/pages/landing/LandingPage'
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Landing page — pública, sem guard */}
+      <Route path="/" element={<LandingPage />} />
+
       {/* Rotas públicas — redireciona para /dashboard se autenticado */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/login" element={<LoginPage />} />
@@ -35,8 +39,7 @@ export default function AppRoutes() {
         <Route path="/:slug" element={<PublicWeddingPage />} />
       </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<div>404 — Página não encontrada</div>} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
