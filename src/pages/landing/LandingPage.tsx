@@ -233,10 +233,10 @@ function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" style={{ backgroundColor: '#3d2c1e' }}>
       {/* Ornamental background shapes */}
       <div
-        className="pointer-events-none absolute -top-32 right-0 h-[600px] w-[600px] rounded-full opacity-20"
+        className="pointer-events-none absolute -top-32 right-0 h-[600px] w-[600px] rounded-full opacity-15"
         style={{ background: 'radial-gradient(circle, #C9956C 0%, transparent 70%)' }}
       />
       <div
@@ -251,7 +251,7 @@ function Hero() {
             A plataforma para o casamento dos seus sonhos
           </p>
 
-          <h1 className="font-cormorant text-5xl font-light leading-tight text-public-text md:text-6xl lg:text-7xl">
+          <h1 className="font-cormorant text-5xl font-light leading-tight text-white md:text-6xl lg:text-7xl">
             Tudo que{' '}
             <em className="italic text-public-gold">vocês</em>{' '}
             precisam,
@@ -259,7 +259,7 @@ function Hero() {
             em um só lugar.
           </h1>
 
-          <p className="mt-6 max-w-md text-base leading-relaxed text-public-muted">
+          <p className="mt-6 max-w-md text-base leading-relaxed text-white/70">
             Página pública personalizada, lista de presentes, confirmação de
             presença e muito mais. Simples para os noivos, encantador para os
             convidados.
@@ -275,7 +275,7 @@ function Hero() {
             </Link>
             <button
               onClick={scrollToFeatures}
-              className="rounded-full border border-public-gold/30 px-8 py-3.5 text-sm font-medium text-public-text transition-colors hover:border-public-gold hover:text-public-gold"
+              className="rounded-full border border-white/25 px-8 py-3.5 text-sm font-medium text-white/80 transition-colors hover:border-public-gold hover:text-public-gold"
             >
               Ver como funciona
             </button>
@@ -290,9 +290,9 @@ function Hero() {
 
       {/* Ornamental divider */}
       <div className="flex items-center justify-center gap-4 pb-8">
-        <div className="h-px w-24 bg-public-gold/30" />
-        <span className="font-cormorant text-2xl text-public-gold/50">♡</span>
-        <div className="h-px w-24 bg-public-gold/30" />
+        <div className="h-px w-24 bg-public-gold/40" />
+        <span className="font-cormorant text-2xl text-public-gold/60">♡</span>
+        <div className="h-px w-24 bg-public-gold/40" />
       </div>
     </section>
   )
@@ -378,7 +378,7 @@ function WeddingPageMockup() {
 
 function Features() {
   return (
-    <section id="features" className="bg-white py-24">
+    <section id="features" className="bg-public-bg py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-16 text-center">
           <p className="mb-3 font-lato text-xs font-medium uppercase tracking-[0.25em] text-public-gold">
@@ -399,9 +399,9 @@ function Features() {
             return (
               <div
                 key={feature.title}
-                className="group rounded-2xl border border-public-gold/10 bg-public-bg p-7 transition-all duration-300 hover:border-public-gold/25 hover:shadow-lg hover:shadow-public-gold/5 hover:-translate-y-0.5"
+                className="group rounded-2xl border border-public-gold/15 bg-white p-7 shadow-sm transition-all duration-300 hover:border-public-gold/40 hover:shadow-md hover:shadow-public-gold/8 hover:-translate-y-0.5"
               >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-public-gold/10 transition-colors group-hover:bg-public-gold/15">
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-public-gold/12 transition-colors group-hover:bg-public-gold/20">
                   <Icon size={20} className="text-public-gold" />
                 </div>
                 <h3 className="font-cormorant text-xl text-public-text">{feature.title}</h3>
@@ -419,19 +419,19 @@ function Features() {
 
 function Pricing() {
   return (
-    <section id="pricing" className="py-24">
+    <section id="pricing" className="py-24" style={{ backgroundColor: '#3d2c1e' }}>
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-16 text-center">
           <p className="mb-3 font-lato text-xs font-medium uppercase tracking-[0.25em] text-public-gold">
             Planos
           </p>
-          <h2 className="font-cormorant text-4xl font-light text-public-text md:text-5xl">
+          <h2 className="font-cormorant text-4xl font-light text-white md:text-5xl">
             Escolha o ideal para vocês
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-public-muted">
+          <p className="mx-auto mt-4 max-w-xl text-white/60">
             Pagamento único por evento. Sem mensalidades, sem surpresas.
           </p>
-          <div className="mx-auto mt-6 h-px w-16 bg-public-gold/40" />
+          <div className="mx-auto mt-6 h-px w-16 bg-public-gold/50" />
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -440,7 +440,7 @@ function Pricing() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-xs text-public-muted">
+        <p className="mt-8 text-center text-xs text-white/40">
           * Os planos são por evento. Não há cobrança recorrente.
         </p>
       </div>
@@ -456,9 +456,10 @@ function PlanCard({ plan }: { plan: Plan }) {
       className={[
         'relative flex flex-col rounded-2xl p-6 transition-all duration-300',
         highlighted
-          ? 'border-2 border-public-gold bg-white shadow-xl shadow-public-gold/10 scale-[1.02]'
-          : 'border border-public-gold/15 bg-white hover:border-public-gold/30 hover:shadow-md',
+          ? 'border-2 border-public-gold shadow-xl shadow-black/30 scale-[1.02]'
+          : 'border border-white/10 hover:border-white/20 hover:shadow-md',
       ].join(' ')}
+      style={{ backgroundColor: highlighted ? '#4e3828' : '#4a3525' }}
     >
       {plan.badge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -469,16 +470,16 @@ function PlanCard({ plan }: { plan: Plan }) {
       )}
 
       <div className="mb-5">
-        <h3 className="font-cormorant text-2xl text-public-text">{plan.name}</h3>
-        <p className="mt-1 text-xs text-public-muted">{plan.description}</p>
+        <h3 className="font-cormorant text-2xl text-white">{plan.name}</h3>
+        <p className="mt-1 text-xs text-white/50">{plan.description}</p>
       </div>
 
       <div className="mb-6 flex items-baseline gap-1">
-        <span className={`font-cormorant text-4xl font-light ${highlighted ? 'text-public-gold' : 'text-public-text'}`}>
+        <span className={`font-cormorant text-4xl font-light ${highlighted ? 'text-public-gold' : 'text-white'}`}>
           {plan.price}
         </span>
         {plan.period && (
-          <span className="text-xs text-public-muted">{plan.period}</span>
+          <span className="text-xs text-white/50">{plan.period}</span>
         )}
       </div>
 
@@ -486,15 +487,15 @@ function PlanCard({ plan }: { plan: Plan }) {
         {plan.features.map((f) => (
           <li key={f.label} className="flex items-start gap-2.5">
             {f.included ? (
-              <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-public-gold/15">
+              <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-public-gold/20">
                 <Check size={10} className="text-public-gold" strokeWidth={3} />
               </span>
             ) : (
               <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center">
-                <Minus size={12} className="text-public-text/20" />
+                <Minus size={12} className="text-white/20" />
               </span>
             )}
-            <span className={`text-xs ${f.included ? 'text-public-text' : 'text-public-text/35'}`}>
+            <span className={`text-xs ${f.included ? 'text-white/85' : 'text-white/25'}`}>
               {f.label}
             </span>
           </li>
@@ -507,7 +508,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           'rounded-full py-2.5 text-center text-xs font-medium transition-all',
           highlighted
             ? 'bg-public-gold text-white shadow-md shadow-public-gold/30 hover:bg-public-gold/90'
-            : 'border border-public-gold/30 text-public-text hover:border-public-gold hover:text-public-gold',
+            : 'border border-white/20 text-white/80 hover:border-public-gold hover:text-public-gold',
         ].join(' ')}
       >
         {plan.cta}
@@ -522,7 +523,7 @@ function Faq() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="bg-white py-24">
+    <section id="faq" className="bg-public-bg py-24">
       <div className="mx-auto max-w-2xl px-6">
         <div className="mb-12 text-center">
           <h2 className="font-cormorant text-4xl font-light text-public-text md:text-5xl">
@@ -535,7 +536,7 @@ function Faq() {
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="overflow-hidden rounded-xl border border-public-gold/15 bg-public-bg transition-all"
+              className="overflow-hidden rounded-xl border border-public-gold/15 bg-white shadow-sm transition-all hover:border-public-gold/35 hover:shadow-md"
             >
               <button
                 onClick={() => setOpen(open === i ? null : i)}
