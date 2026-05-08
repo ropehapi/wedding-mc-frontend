@@ -10,6 +10,9 @@ import WeddingPage from '@/pages/admin/WeddingPage'
 import GuestsPage from '@/pages/admin/GuestsPage'
 import GiftsPage from '@/pages/admin/GiftsPage'
 import TablesPage from '@/pages/admin/TablesPage'
+import ForgotPasswordPage from '@/pages/admin/ForgotPasswordPage'
+import ResetPasswordPage from '@/pages/admin/ResetPasswordPage'
+import AccountPage from '@/pages/admin/AccountPage'
 import PublicWeddingPage from '@/pages/public/PublicWeddingPage'
 import LandingPage from '@/pages/landing/LandingPage'
 
@@ -23,6 +26,8 @@ export default function AppRoutes() {
       <Route element={<PublicOnlyRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Route>
 
       {/* Rotas protegidas com layout admin */}
@@ -33,6 +38,7 @@ export default function AppRoutes() {
           <Route path="/guests" element={<GuestsPage />} />
           <Route path="/gifts" element={<GiftsPage />} />
           <Route path="/tables" element={<TablesPage />} />
+          <Route path="/account" element={<AccountPage />} />
         </Route>
       </Route>
 

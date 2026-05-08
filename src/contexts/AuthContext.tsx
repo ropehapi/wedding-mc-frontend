@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { publicClient } from '@/api/client'
+import { client, publicClient } from '@/api/client'
 import { queryClient } from '@/lib/queryClient'
 import type { LoginResponse, User } from '@/types/api'
 
@@ -10,6 +10,7 @@ interface AuthContextValue {
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
 
 function hasValidToken() {
@@ -69,9 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    await client.post('/v1/auth/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    })
+  }, [])
+
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, isLoading, login, logout }}
+      value={{ user, isAuthenticated, isLoading, login, logout, changePassword }}
     >
       {children}
     </AuthContext.Provider>
