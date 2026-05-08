@@ -1,8 +1,14 @@
 import { publicClient } from './client'
 import type { LoginResponse, RegisterResponse } from '@/types/api'
 
-export function register(name: string, email: string, password: string) {
-  return publicClient.post<RegisterResponse>('/v1/auth/register', { name, email, password })
+export function register(name: string, email: string, password: string, brideName: string, groomName: string) {
+  return publicClient.post<RegisterResponse>('/v1/auth/register', {
+    name,
+    email,
+    password,
+    bride_name: brideName,
+    groom_name: groomName,
+  })
 }
 
 export function login(email: string, password: string) {

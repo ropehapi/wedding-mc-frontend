@@ -13,6 +13,8 @@ const schema = z.object({
   name: z.string().min(1, 'Nome obrigatório'),
   email: z.string().email('E-mail inválido'),
   password: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
+  brideName: z.string().min(1, 'Nome da noiva obrigatório'),
+  groomName: z.string().min(1, 'Nome do noivo obrigatório'),
 })
 
 type FormData = z.infer<typeof schema>
@@ -30,7 +32,7 @@ export default function RegisterPage() {
   async function onSubmit(data: FormData) {
     setError(null)
     try {
-      await registerApi(data.name, data.email, data.password)
+      await registerApi(data.name, data.email, data.password, data.brideName, data.groomName)
       navigate('/login')
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 409) {
@@ -63,6 +65,34 @@ export default function RegisterPage() {
               {errors.name && (
                 <p className="text-xs text-destructive">{errors.name.message}</p>
               )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="brideName">Nome da noiva</Label>
+                <Input
+                  id="brideName"
+                  type="text"
+                  placeholder="Ana"
+                  {...register('brideName')}
+                />
+                {errors.brideName && (
+                  <p className="text-xs text-destructive">{errors.brideName.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="groomName">Nome do noivo</Label>
+                <Input
+                  id="groomName"
+                  type="text"
+                  placeholder="Pedro"
+                  {...register('groomName')}
+                />
+                {errors.groomName && (
+                  <p className="text-xs text-destructive">{errors.groomName.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-1.5">
