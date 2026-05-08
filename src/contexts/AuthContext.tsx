@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { publicClient } from '@/api/client'
+import { queryClient } from '@/lib/queryClient'
 import type { LoginResponse, User } from '@/types/api'
 
 interface AuthContextValue {
@@ -62,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
+      queryClient.clear()
       setUser(null)
       setIsAuthenticated(false)
     }
