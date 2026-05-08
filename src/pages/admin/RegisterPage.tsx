@@ -8,13 +8,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
+import { Eye, EyeOff } from 'lucide-react'
 
 const schema = z.object({
   name: z.string().min(1, 'Nome obrigatório'),
   email: z.string().email('E-mail inválido'),
   password: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
+  confirmPassword: z.string().min(1, 'Confirmação de senha obrigatória'),
   brideName: z.string().min(1, 'Nome da noiva obrigatório'),
   groomName: z.string().min(1, 'Nome do noivo obrigatório'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'As senhas não coincidem',
+  path: ['confirmPassword'],
 })
 
 type FormData = z.infer<typeof schema>
@@ -22,6 +27,7 @@ type FormData = z.infer<typeof schema>
 export default function RegisterPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     register,
@@ -54,11 +60,11 @@ export default function RegisterPage() {
         <div className="rounded-xl border border-admin-border bg-white p-8 shadow-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Nome</Label>
+              <Label htmlFor="name">Nome do usuário</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Ana e Pedro"
+                placeholder="Ana Julia Santos"
                 autoComplete="name"
                 {...register('name')}
               />
@@ -111,15 +117,51 @@ export default function RegisterPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Mínimo 8 caracteres"
-                autoComplete="new-password"
-                {...register('password')}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Mínimo 8 caracteres"
+                  autoComplete="new-password"
+                  className="pr-10"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-admin-muted hover:text-admin-text"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-xs text-destructive">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmPassword">Confirmar senha</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Repita a senha"
+                  autoComplete="new-password"
+                  className="pr-10"
+                  {...register('confirmPassword')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-admin-muted hover:text-admin-text"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
 
